@@ -10,29 +10,33 @@ import (
 	//"time"
 )
 
-var (
+type Context struct {
 	mutex sync.RWMutex
-	data  = make(map[interface{}]interface{})
-)
+	data  map[interface{}]interface{}
+}
 
 // Set stores a value for a given key in a given request.
-func Set(key, val interface{}) {
-	mutex.Lock()
-	if data[key] == nil {
-		data[key] = val
+func (c *Context) Init() {
+	c.data = make(map[interface{}]interface{})
+
+}
+func (c *Context) Set(key, val interface{}) {
+	c.mutex.Lock()
+	if c.data[key] == nil {
+		c.data[key] = val
 	}
-	mutex.Unlock()
+	c.mutex.Unlock()
 }
 
 // Get returns a value stored for a given key in a given request.
-func Get(key interface{}) interface{} {
-	mutex.RLock()
-	if value := data[key]; value != nil {
-		
-		mutex.RUnlock()
+func (c *Context) Get(key interface{}) interface{} {
+	c.mutex.RLock()
+	if value := c.data[key]; value != nil {
+
+		c.mutex.RUnlock()
 		return value
 	}
-	mutex.RUnlock()
+	c.mutex.RUnlock()
 	return nil
 }
 
